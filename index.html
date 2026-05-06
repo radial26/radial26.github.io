@@ -101,34 +101,41 @@
           <!--
             Waitlist form
             -------------
-            To collect signups, set the form's `action` to your endpoint of
-            choice (Formspree, Buttondown, your own backend, etc.) and
-            optionally set `data-endpoint` to the same URL — the inline
-            script will submit via fetch and show a success state in-place.
-
-            Example with Formspree:
-              <form action="https://formspree.io/f/your-id" method="POST"
-                    data-endpoint="https://formspree.io/f/your-id" ...>
+            Submissions land in a Google Form (which writes to a Google Sheet).
+            Form ID and field IDs are pulled from the form's HTML; the entry
+            IDs are used as the input `name` attributes so a non-JS native
+            POST also works (it'll redirect to Google's "response recorded"
+            page instead of showing an inline message).
           -->
           <form class="signup"
-                action="#"
+                action="https://docs.google.com/forms/d/e/1FAIpQLSfjjv_7DZSxjZkTr04zX2qsMPKBOHuEhlrLN5JvlooQM5X5Qw/formResponse"
                 method="POST"
-                data-endpoint=""
+                target="_self"
                 novalidate>
             <div class="field">
-              <label for="email" class="visually-hidden" style="position:absolute;left:-9999px;">email</label>
-              <input id="email"
-                     name="email"
-                     type="email"
-                     autocomplete="email"
+              <label for="wl-name" class="visually-hidden">name</label>
+              <input id="wl-name"
+                     name="entry.943589167"
+                     type="text"
+                     autocomplete="given-name"
                      required
-                     placeholder="you@somewhere.com" />
+                     placeholder="your name" />
+            </div>
+            <div class="field">
+              <label for="wl-phone" class="visually-hidden">phone number</label>
+              <input id="wl-phone"
+                     name="entry.361823065"
+                     type="tel"
+                     inputmode="tel"
+                     autocomplete="tel"
+                     required
+                     placeholder="phone number" />
             </div>
             <button type="submit">request access</button>
           </form>
 
           <p class="signup-meta">
-            We'll only email you about Radial. No spam, no third parties, ever.
+            We'll only contact you about Radial. No spam, no third parties, ever.
             See our <a href="privacy.html">privacy policy</a>.
           </p>
 
@@ -151,12 +158,16 @@
     // year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // waitlist form: AJAX submit to endpoint if configured, else show
-    // a friendly message asking the visitor to email instead.
+    // waitlist form: posts to Google Forms via fetch with mode:'no-cors'.
+    // The response is opaque (we can't read it), so we show the success
+    // state once the request resolves. If the network call rejects, we
+    // fall back to a native form submit so the data still gets through.
     (function () {
       const form = document.querySelector('form.signup');
       const status = document.getElementById('signup-status');
       const button = form.querySelector('button');
+      const nameInput = form.querySelector('#wl-name');
+      const phoneInput = form.querySelector('#wl-phone');
 
       function setStatus(kind, html) {
         status.className = 'signup-status ' + kind;
@@ -165,20 +176,19 @@
 
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const endpoint = form.getAttribute('data-endpoint');
-        const email = form.email.value.trim();
 
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          setStatus('error', 'Please enter a valid email address.');
-          form.email.focus();
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        const phoneDigits = phone.replace(/\D/g, '');
+
+        if (!name) {
+          setStatus('error', 'Please enter your name.');
+          nameInput.focus();
           return;
         }
-
-        if (!endpoint) {
-          setStatus('success',
-            "Thanks — you're noted. We're still wiring up the waitlist; " +
-            "in the meantime, email <a href=\"mailto:hello@joinradial.com?subject=Waitlist\">" +
-            "hello@joinradial.com</a> and we'll add you manually.");
+        if (phoneDigits.length < 7) {
+          setStatus('error', 'Please enter a valid phone number.');
+          phoneInput.focus();
           return;
         }
 
@@ -187,19 +197,19 @@
         button.textContent = 'sending…';
 
         try {
-          const res = await fetch(endpoint, {
+          await fetch(form.action, {
             method: 'POST',
-            headers: { 'Accept': 'application/json' },
+            mode: 'no-cors',
             body: new FormData(form),
           });
-          if (!res.ok) throw new Error('Request failed');
           form.reset();
           setStatus('success',
-            "You're on the list. We'll be in touch as Radial opens in your area.");
+            "You're on the list. We'll reach out as Radial opens in your area.");
         } catch (err) {
-          setStatus('error',
-            "Something went wrong. Try again in a moment, or email " +
-            "<a href=\"mailto:hello@joinradial.com?subject=Waitlist\">hello@joinradial.com</a>.");
+          // Network truly failed — fall back to native submit so the
+          // user's response still reaches Google.
+          form.submit();
+          return;
         } finally {
           button.disabled = false;
           button.textContent = original;

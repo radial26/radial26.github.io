@@ -191,15 +191,26 @@
         activeIndex = -1;
       }
 
+      function position() {
+        const r = input.getBoundingClientRect();
+        list.style.top = (r.bottom + 6) + 'px';
+        list.style.left = r.left + 'px';
+        list.style.width = r.width + 'px';
+      }
+
       function render(items) {
         if (!items.length) { close(); return; }
         list.innerHTML = items.map((label, i) =>
           `<li role="option" id="city-opt-${i}" data-value="${escape(label)}">${escape(label)}</li>`
         ).join('');
         list.hidden = false;
+        position();
         input.setAttribute('aria-expanded', 'true');
         activeIndex = -1;
       }
+
+      window.addEventListener('resize', () => { if (!list.hidden) position(); });
+      window.addEventListener('scroll', () => { if (!list.hidden) position(); }, { passive: true });
 
       function highlight(idx) {
         const items = list.querySelectorAll('li');

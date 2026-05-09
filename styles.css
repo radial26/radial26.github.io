@@ -320,11 +320,13 @@ form.signup button span {
 }
 
 .city-suggestions {
-  position: absolute;
-  top: calc(100% + 6px);
+  /* Fixed positioning lets the dropdown escape any clipped ancestor.
+     The actual top/left/width are set inline by JS on each render. */
+  position: fixed;
+  top: 0;
   left: 0;
-  right: 0;
-  z-index: 30;
+  width: 0;
+  z-index: 1000;
   margin: 0;
   padding: 6px;
   list-style: none;

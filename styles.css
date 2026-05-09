@@ -282,6 +282,10 @@ form.signup button span {
     url("assets/hero-scene-crop.png") center center / cover no-repeat;
 }
 
+/* Inline hero image — only shown when the layout collapses to a single
+   column (mobile/tablet). Sits between the wordmark and the intro copy. */
+.scene-mobile { display: none; }
+
 .landing-footer {
   grid-column: 1 / -1;
   display: flex;
@@ -616,21 +620,19 @@ body.legal-page {
 
   .privacy-note { margin-top: 40px; }
 
-  /* On mobile/tablet the scene becomes a clear "hero illustration"
-     section under the copy, with a soft fade at the top so it doesn't
-     feel like an abrupt cut from the dark copy section. */
-  .landing-scene {
-    position: relative;
-    min-height: 42vh;
-    background-position: 64% center;
-  }
-  .landing-scene::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 80px;
-    background: linear-gradient(180deg, rgba(2, 2, 10, 0.7), rgba(2, 2, 10, 0));
-    pointer-events: none;
+  /* On mobile/tablet the side scene panel is replaced by an inline
+     hero image rendered between the wordmark and the intro paragraph. */
+  .landing-scene { display: none; }
+
+  .scene-mobile {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    margin: 4px 0 26px;
+    border-radius: 20px;
+    background: url("assets/hero-scene-crop.png") center center / cover no-repeat;
+    box-shadow: 0 18px 40px rgba(2, 1, 12, 0.45),
+                inset 0 0 0 1px rgba(124, 82, 220, 0.18);
   }
 
   .landing-footer {
@@ -647,7 +649,13 @@ body.legal-page {
   }
 
   .brand-block {
-    margin-bottom: 32px;
+    margin-bottom: 18px;
+  }
+
+  .scene-mobile {
+    aspect-ratio: 4 / 3;
+    margin: 2px 0 22px;
+    border-radius: 18px;
   }
 
   .brand-block h1 {
@@ -704,8 +712,6 @@ body.legal-page {
     font-size: 15.5px;
   }
 
-  .landing-scene { min-height: 38vh; }
-
   .legal-page .shell {
     padding: 22px 18px 40px;
   }
@@ -750,7 +756,12 @@ body.legal-page {
   }
 
   .brand-block {
-    margin-bottom: 24px;
+    margin-bottom: 14px;
+  }
+
+  .scene-mobile {
+    margin-bottom: 18px;
+    border-radius: 16px;
   }
 
   .brand-block h1 {
@@ -778,17 +789,15 @@ body.legal-page {
     padding: 16px 22px max(18px, env(safe-area-inset-bottom));
     font-size: 12.5px;
   }
-
-  .landing-scene { min-height: 34vh; }
 }
 
 /* Landscape phones — keep things compact and readable. */
 @media (max-width: 1100px) and (max-height: 520px) and (orientation: landscape) {
   .landing-copy { padding: 28px 24px 24px; }
-  .brand-block { margin-bottom: 18px; }
+  .brand-block { margin-bottom: 12px; }
+  .scene-mobile { aspect-ratio: 21 / 9; margin-bottom: 18px; }
   .intro { margin-bottom: 18px; }
   .privacy-note { margin-top: 20px; }
-  .landing-scene { min-height: 50vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {

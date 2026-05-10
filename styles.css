@@ -319,6 +319,10 @@ form.signup button span {
   opacity: 1;
 }
 
+.firefly-layer-mobile {
+  display: none;
+}
+
 .firefly {
   position: absolute;
   width: 8px;
@@ -536,6 +540,15 @@ form.signup button span {
   animation-duration: 19s, 5.7s;
   animation-delay: -9s, -1.9s;
 }
+
+.fm1 { left: 8%; top: 12%; width: 5px; height: 5px; animation-duration: 15s, 4.5s; animation-delay: -3s, -1.2s; }
+.fm2 { left: 18%; top: 48%; width: 7px; height: 7px; animation-duration: 18s, 5.8s; animation-delay: -9s, -2.2s; }
+.fm3 { left: 34%; top: 26%; width: 5px; height: 5px; animation-duration: 14s, 4.1s; animation-delay: -6s, -0.8s; }
+.fm4 { left: 52%; top: 66%; width: 8px; height: 8px; animation-duration: 20s, 6.4s; animation-delay: -12s, -3.1s; }
+.fm5 { left: 68%; top: 18%; width: 6px; height: 6px; animation-duration: 16s, 4.9s; animation-delay: -7s, -1.7s; }
+.fm6 { left: 78%; top: 52%; width: 7px; height: 7px; animation-duration: 19s, 5.5s; animation-delay: -14s, -2.6s; }
+.fm7 { left: 88%; top: 30%; width: 5px; height: 5px; animation-duration: 13s, 4s; animation-delay: -4s, -0.9s; }
+.fm8 { left: 60%; top: 84%; width: 9px; height: 9px; animation-duration: 21s, 6.1s; animation-delay: -15s, -2.9s; }
 
 @keyframes firefly-drift {
   0% {
@@ -935,6 +948,7 @@ body.legal-page {
   }
 
   .scene-mobile {
+    position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 16 / 10;
@@ -943,6 +957,11 @@ body.legal-page {
     background: url("assets/hero-scene-crop.png") center center / cover no-repeat;
     box-shadow: 0 18px 40px rgba(2, 1, 12, 0.45),
                 inset 0 0 0 1px rgba(124, 82, 220, 0.18);
+  }
+
+  .firefly-layer-mobile {
+    display: block;
+    inset: 0;
   }
 
   .landing-footer {

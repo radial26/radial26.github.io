@@ -22,6 +22,8 @@
           <p class="tagline">try the warm approach.</p>
         </div>
 
+        <div class="scene-mobile" role="img" aria-label="warm city scene at golden hour"></div>
+
         <p class="intro">
           Radial is for connection in the moment.
           Feel who’s nearby, express interest privately,
@@ -44,15 +46,23 @@
                    required
                    placeholder="Phone number" />
           </div>
-          <div class="field with-icon">
-            <label for="wl-location" class="visually-hidden">location</label>
+          <div class="field with-icon city-field">
+            <label for="wl-city" class="visually-hidden">city</label>
             <span class="field-icon pin" aria-hidden="true"></span>
-            <input id="wl-location"
+            <input id="wl-city"
                    name="entry.943589167"
                    type="text"
-                   autocomplete="address-level2"
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="words"
+                   spellcheck="false"
                    required
-                   placeholder="Location" />
+                   placeholder="City"
+                   role="combobox"
+                   aria-expanded="false"
+                   aria-autocomplete="list"
+                   aria-controls="city-suggestions" />
+            <ul class="city-suggestions" id="city-suggestions" role="listbox" hidden></ul>
           </div>
           <button type="submit">join the waitlist <span aria-hidden="true">→</span></button>
         </form>
@@ -87,10 +97,20 @@
           <span class="firefly f8"></span>
         </div>
       </section>
+
+      <footer class="landing-footer">
+        <span class="footer-mark">© <span id="year"></span> Radial</span>
+        <nav class="footer-links" aria-label="Legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+        </nav>
+      </footer>
     </main>
   </div>
 
   <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
     // waitlist form: posts to Google Forms via fetch with mode:'no-cors'.
     // The response is opaque (we can't read it), so we show the success
     // state once the request resolves. If the network call rejects, we
@@ -100,7 +120,7 @@
       const status = document.getElementById('signup-status');
       const button = form.querySelector('button');
       const phoneInput = form.querySelector('#wl-phone');
-      const locationInput = form.querySelector('#wl-location');
+      const cityInput = form.querySelector('#wl-city');
 
       function setStatus(kind, html) {
         status.className = 'signup-status ' + kind;
@@ -111,7 +131,7 @@
         e.preventDefault();
 
         const phone = phoneInput.value.trim();
-        const location = locationInput.value.trim();
+        const city = cityInput.value.trim();
         const phoneDigits = phone.replace(/\D/g, '');
 
         if (phoneDigits.length < 7) {
@@ -119,9 +139,9 @@
           phoneInput.focus();
           return;
         }
-        if (!location) {
-          setStatus('error', 'Please enter your location.');
-          locationInput.focus();
+        if (!city) {
+          setStatus('error', 'Please enter your city.');
+          cityInput.focus();
           return;
         }
 
@@ -148,6 +168,138 @@
           button.textContent = original;
         }
       });
+    })();
+
+    // City autocomplete via Photon (komoot) — free, no API key, OSM-based.
+    // Filters results to actual populated places (city/town/village) and
+    // renders a small dropdown of "City, Region, Country" suggestions.
+    (function () {
+      const input = document.getElementById('wl-city');
+      const list = document.getElementById('city-suggestions');
+      if (!input || !list) return;
+
+      const PLACE_TYPES = new Set(['city', 'town', 'village', 'hamlet']);
+      let debounceId = null;
+      let activeRequest = null;
+      let activeIndex = -1;
+      let lastQuery = '';
+
+      function escape(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+      }
+
+      function format(props) {
+        const name = props.name || '';
+        const region = props.state || props.county || '';
+        const country = props.country || '';
+        return [name, region, country].filter(Boolean).join(', ');
+      }
+
+      function close() {
+        list.hidden = true;
+        list.innerHTML = '';
+        input.setAttribute('aria-expanded', 'false');
+        activeIndex = -1;
+      }
+
+      function position() {
+        const r = input.getBoundingClientRect();
+        list.style.top = (r.bottom + 6) + 'px';
+        list.style.left = r.left + 'px';
+        list.style.width = r.width + 'px';
+      }
+
+      function render(items) {
+        if (!items.length) { close(); return; }
+        list.innerHTML = items.map((label, i) =>
+          `<li role="option" id="city-opt-${i}" data-value="${escape(label)}">${escape(label)}</li>`
+        ).join('');
+        list.hidden = false;
+        position();
+        input.setAttribute('aria-expanded', 'true');
+        activeIndex = -1;
+      }
+
+      window.addEventListener('resize', () => { if (!list.hidden) position(); });
+      window.addEventListener('scroll', () => { if (!list.hidden) position(); }, { passive: true });
+
+      function highlight(idx) {
+        const items = list.querySelectorAll('li');
+        if (!items.length) return;
+        if (idx < 0) idx = items.length - 1;
+        if (idx >= items.length) idx = 0;
+        items.forEach((el, i) => el.classList.toggle('active', i === idx));
+        activeIndex = idx;
+        input.setAttribute('aria-activedescendant', `city-opt-${idx}`);
+      }
+
+      function pick(label) {
+        input.value = label;
+        close();
+      }
+
+      async function fetchCities(q) {
+        if (activeRequest) activeRequest.abort();
+        const ctrl = new AbortController();
+        activeRequest = ctrl;
+        try {
+          const url = `https://photon.komoot.io/api?q=${encodeURIComponent(q)}&limit=8&lang=en`;
+          const res = await fetch(url, { signal: ctrl.signal });
+          if (!res.ok) return;
+          const json = await res.json();
+          // Only keep populated places. De-duplicate identical "city, region,
+          // country" labels (Photon often returns multiple OSM entries).
+          const seen = new Set();
+          const items = (json.features || [])
+            .filter(f => PLACE_TYPES.has((f.properties || {}).osm_value))
+            .map(f => format(f.properties))
+            .filter(label => {
+              if (!label || seen.has(label)) return false;
+              seen.add(label);
+              return true;
+            })
+            .slice(0, 5);
+          if (input.value.trim() === q) render(items);
+        } catch (err) {
+          // Ignore aborts and network errors silently — the user can still
+          // type their city manually.
+        }
+      }
+
+      input.addEventListener('input', () => {
+        const q = input.value.trim();
+        if (q === lastQuery) return;
+        lastQuery = q;
+        clearTimeout(debounceId);
+        if (q.length < 2) { close(); return; }
+        debounceId = setTimeout(() => fetchCities(q), 220);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (list.hidden) return;
+        const items = list.querySelectorAll('li');
+        if (e.key === 'ArrowDown') { e.preventDefault(); highlight(activeIndex + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); highlight(activeIndex - 1); }
+        else if (e.key === 'Enter' && activeIndex >= 0) {
+          e.preventDefault();
+          pick(items[activeIndex].dataset.value);
+        } else if (e.key === 'Escape') {
+          close();
+        }
+      });
+
+      list.addEventListener('mousedown', (e) => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        // Use mousedown so we beat the input's blur and stop the input
+        // from losing focus before we can read the value.
+        e.preventDefault();
+        pick(li.dataset.value);
+      });
+
+      input.addEventListener('blur', () => setTimeout(close, 120));
     })();
   </script>
 </body>

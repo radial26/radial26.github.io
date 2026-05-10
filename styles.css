@@ -128,11 +128,8 @@ p { margin: 0; }
   font-weight: 900;
   letter-spacing: -0.04em;
   color: #f5f2ff;
-  -webkit-text-stroke: 0.9px rgba(255, 235, 163, 0.92);
-  text-shadow:
-    0 0 1px rgba(255, 235, 163, 0.72),
-    0 0 10px rgba(255, 214, 122, 0.14),
-    0 0 18px rgba(255, 214, 122, 0.07);
+  -webkit-text-stroke: 0;
+  text-shadow: none;
 }
 
 .tagline {

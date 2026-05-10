@@ -66,7 +66,7 @@ p { margin: 0; }
   position: relative;
   height: 100%;
   display: grid;
-  grid-template-columns: 34.5% 65.5%;
+  grid-template-columns: 34% 66%;
   grid-template-rows: 1fr auto;
   background: linear-gradient(180deg, rgba(4, 5, 16, 0.98), rgba(3, 4, 12, 1));
   border: 1px solid rgba(102, 88, 154, 0.42);
@@ -75,20 +75,46 @@ p { margin: 0; }
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
+.landing-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 36px;
+  left: 30%;
+  width: 240px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(2, 2, 10, 0) 0%, rgba(9, 6, 20, 0.16) 12%, rgba(15, 9, 31, 0.34) 30%, rgba(18, 10, 36, 0.44) 48%, rgba(18, 10, 36, 0.24) 72%, rgba(18, 10, 36, 0) 100%);
+  filter: blur(16px);
+  z-index: 3;
+}
+
 .landing-copy {
   position: relative;
   z-index: 2;
-  padding: clamp(38px, 6vh, 72px) 42px clamp(28px, 4vh, 44px) clamp(42px, 5vw, 82px);
+  padding: clamp(34px, 5.2vh, 64px) 30px clamp(24px, 3.5vh, 40px) clamp(34px, 4vw, 60px);
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(2, 2, 10, 0.98) 0%, rgba(2, 2, 10, 0.96) 68%, rgba(2, 2, 10, 0.58) 100%);
-  justify-content: flex-start;
+    linear-gradient(90deg, rgba(2, 2, 10, 0.93) 0%, rgba(2, 2, 10, 0.9) 54%, rgba(7, 4, 18, 0.68) 78%, rgba(7, 4, 18, 0.16) 100%);
+  justify-content: center;
+}
+
+.landing-copy::after {
+  content: none;
+}
+
+.landing-copy > * {
+  position: relative;
+  z-index: 1;
 }
 
 .brand-block {
-  margin-bottom: clamp(26px, 3.8vh, 52px);
+  margin-bottom: clamp(22px, 3.2vh, 40px);
+  width: 100%;
+  max-width: 500px;
 }
 
 .brand-block h1 {
@@ -97,7 +123,7 @@ p { margin: 0; }
      Nunito on platforms without ui-rounded support. */
   font-family: ui-rounded, "SF Pro Rounded", "Nunito", -apple-system,
                BlinkMacSystemFont, system-ui, sans-serif;
-  font-size: clamp(48px, 4.3vw, 64px);
+  font-size: clamp(40px, 3.6vw, 52px);
   line-height: 0.94;
   font-weight: 900;
   letter-spacing: -0.04em;
@@ -105,24 +131,33 @@ p { margin: 0; }
 
 .tagline {
   color: #a95bff;
-  font-size: clamp(20px, 1.9vw, 30px);
+  font-size: clamp(18px, 1.6vw, 26px);
   letter-spacing: -0.03em;
   font-weight: 400;
 }
 
 .intro {
-  max-width: 420px;
+  max-width: 520px;
   color: var(--text-secondary);
-  font-size: clamp(18px, 2vh, 21px);
-  line-height: 1.5;
-  margin-bottom: clamp(24px, 3.7vh, 46px);
+  font-size: clamp(13px, 1.18vw, 15px);
+  line-height: 1.42;
+  margin-bottom: clamp(18px, 2.4vh, 28px);
+  width: 100%;
 }
 
 form.signup {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 412px;
+  gap: 10px;
+  max-width: 520px;
+  width: 100%;
+}
+
+form.signup .field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
 }
 
 .field {
@@ -135,17 +170,17 @@ form.signup {
 
 .field-icon {
   position: absolute;
-  left: 19px;
+  left: 17px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 27px;
+  font-size: 22px;
   line-height: 1;
   z-index: 1;
 }
 
 .field-icon.pin {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   border-radius: 50% 50% 50% 0;
   transform: translateY(-56%) rotate(-45deg);
   background: linear-gradient(180deg, #a95bff 0%, #7b46f7 100%);
@@ -154,7 +189,7 @@ form.signup {
 .field-icon.pin::after {
   content: "";
   position: absolute;
-  inset: 5px;
+  inset: 4px;
   border-radius: 50%;
   background: #160c31;
 }
@@ -163,13 +198,13 @@ form.signup input[type="tel"],
 form.signup input[type="text"],
 form.signup input[type="email"] {
   width: 100%;
-  height: clamp(54px, 6vh, 64px);
-  padding: 0 24px 0 66px;
+  height: clamp(48px, 5.3vh, 56px);
+  padding: 0 20px 0 54px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-soft);
   background: rgba(8, 7, 21, 0.94);
   color: var(--text-primary);
-  font: 400 16px/1.2 "Inter", sans-serif;
+  font: 400 14px/1.2 "Inter", sans-serif;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   outline: none;
 }
@@ -187,71 +222,57 @@ form.signup button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
-  height: clamp(58px, 6.8vh, 70px);
-  margin-top: 4px;
-  border: 0;
+  height: clamp(52px, 5.8vh, 60px);
+  margin-top: 2px;
+  border: 1px solid rgba(154, 92, 255, 0.72);
   border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, #7f49eb 0%, #6d33ea 100%);
+  background:
+    linear-gradient(180deg, rgba(10, 8, 24, 0.96), rgba(7, 6, 18, 0.96));
   color: #f7f3ff;
-  font: 500 clamp(18px, 2.2vh, 22px)/1 "Inter", sans-serif;
+  font: 500 clamp(15px, 1.3vw, 18px)/1 "Inter", sans-serif;
   letter-spacing: -0.03em;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 18px 40px rgba(82, 39, 182, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(169, 91, 255, 0.18),
+    0 0 18px rgba(124, 82, 220, 0.34),
+    0 0 34px rgba(124, 82, 220, 0.16);
   transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
 }
 
 form.signup button:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 24px 50px rgba(82, 39, 182, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 0 1px rgba(188, 124, 255, 0.26),
+    0 0 22px rgba(124, 82, 220, 0.42),
+    0 0 42px rgba(124, 82, 220, 0.2);
 }
 
 form.signup button span {
-  font-size: 32px;
+  font-size: 24px;
   line-height: 0.8;
 }
 
 .rollout-copy {
-  max-width: 368px;
-  margin-top: clamp(20px, 3vh, 30px);
+  max-width: 420px;
+  margin-top: clamp(14px, 1.8vh, 20px);
   color: var(--text-muted);
-  font-size: clamp(15px, 1.8vh, 17px);
-  line-height: 1.6;
+  font-size: clamp(13px, 1vw, 14px);
+  line-height: 1.5;
+  width: 100%;
 }
 
 .privacy-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  max-width: 380px;
-  margin-top: auto;
-  padding-top: clamp(16px, 2.5vh, 36px);
+  max-width: 430px;
+  margin-top: clamp(18px, 2.2vh, 26px);
+  padding-top: 0;
   color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.lock-icon {
-  position: relative;
-  flex: 0 0 auto;
-  width: 14px;
-  height: 12px;
-  margin-top: 5px;
-  border-radius: 3px;
-  background: linear-gradient(180deg, #a95bff 0%, #7b46f7 100%);
-}
-
-.lock-icon::before {
-  content: "";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  bottom: 9px;
-  height: 8px;
-  border: 2px solid #a95bff;
-  border-bottom: 0;
-  border-radius: 8px 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.62;
+  width: 100%;
 }
 
 .signup-status {
@@ -280,6 +301,7 @@ form.signup button span {
 .landing-scene {
   position: relative;
   min-height: 0;
+  margin-left: -48px;
   background:
     linear-gradient(90deg, rgba(3, 3, 11, 0.1), rgba(3, 3, 11, 0)),
     url("assets/hero-scene-crop.png") center center / cover no-repeat;
@@ -290,6 +312,11 @@ form.signup button span {
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+}
+
+.firefly-layer-copy {
+  inset: -10% 4% -8% -16%;
+  opacity: 0.9;
 }
 
 .firefly {
@@ -307,6 +334,15 @@ form.signup button span {
   animation:
     firefly-drift 16s ease-in-out infinite,
     firefly-pulse 4.8s ease-in-out infinite;
+}
+
+.firefly-layer-copy .firefly {
+  width: 6px;
+  height: 6px;
+  opacity: 0.2;
+  box-shadow:
+    0 0 6px rgba(255, 224, 130, 0.7),
+    0 0 14px rgba(255, 208, 95, 0.28);
 }
 
 .f1 {
@@ -375,6 +411,85 @@ form.signup button span {
   height: 9px;
   animation-duration: 21s, 5s;
   animation-delay: -15s, -2.4s;
+}
+
+.fc1 {
+  left: 8%;
+  top: 18%;
+  animation-duration: 17s, 5.4s;
+  animation-delay: -3s, -1.4s;
+}
+
+.fc2 {
+  left: 76%;
+  top: 14%;
+  width: 5px;
+  height: 5px;
+  animation-duration: 13s, 4.2s;
+  animation-delay: -8s, -0.5s;
+}
+
+.fc3 {
+  left: 18%;
+  top: 56%;
+  width: 7px;
+  height: 7px;
+  animation-duration: 19s, 6s;
+  animation-delay: -10s, -2.1s;
+}
+
+.fc4 {
+  left: 82%;
+  top: 70%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 15s, 4.6s;
+  animation-delay: -6s, -1.8s;
+}
+
+.fc5 {
+  left: 46%;
+  top: 84%;
+  width: 6px;
+  height: 6px;
+  animation-duration: 18s, 5.8s;
+  animation-delay: -12s, -2.7s;
+}
+
+.fc6 {
+  left: 4%;
+  top: 38%;
+  width: 5px;
+  height: 5px;
+  animation-duration: 16s, 4.8s;
+  animation-delay: -4s, -1.6s;
+}
+
+.fc7 {
+  left: 64%;
+  top: 32%;
+  width: 4px;
+  height: 4px;
+  animation-duration: 14s, 4.2s;
+  animation-delay: -9s, -2.3s;
+}
+
+.fc8 {
+  left: 26%;
+  top: 74%;
+  width: 7px;
+  height: 7px;
+  animation-duration: 20s, 6.2s;
+  animation-delay: -14s, -0.9s;
+}
+
+.fc9 {
+  left: 88%;
+  top: 54%;
+  width: 5px;
+  height: 5px;
+  animation-duration: 17s, 5.1s;
+  animation-delay: -7s, -2.8s;
 }
 
 @keyframes firefly-drift {
@@ -735,6 +850,23 @@ body.legal-page {
     display: block;
   }
 
+  .landing-card::before {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    height: 96px;
+    transform: none;
+    background: linear-gradient(180deg, rgba(2, 2, 10, 0) 0%, rgba(12, 7, 26, 0.3) 35%, rgba(12, 7, 26, 0.44) 55%, rgba(12, 7, 26, 0) 100%);
+    filter: blur(12px);
+  }
+
+  .landing-copy::after,
+  .firefly-layer-copy {
+    display: none;
+  }
+
   .brand-block,
   .intro,
   form.signup,
@@ -746,9 +878,16 @@ body.legal-page {
 
   .privacy-note { margin-top: 40px; }
 
+  form.signup .field-row {
+    grid-template-columns: 1fr;
+  }
+
   /* On mobile/tablet the side scene panel is replaced by an inline
      hero image rendered between the wordmark and the intro paragraph. */
-  .landing-scene { display: none; }
+  .landing-scene {
+    display: none;
+    margin-left: 0;
+  }
 
   .scene-mobile {
     display: block;
@@ -795,7 +934,7 @@ body.legal-page {
 
   .intro {
     margin-bottom: 28px;
-    font-size: clamp(16px, 4.4vw, 19px);
+    font-size: clamp(15px, 4vw, 17px);
     line-height: 1.55;
   }
 

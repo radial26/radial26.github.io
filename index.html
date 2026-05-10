@@ -17,6 +17,17 @@
   <div class="shell">
     <main class="landing-card">
       <section class="landing-copy">
+        <div class="firefly-layer firefly-layer-copy" aria-hidden="true">
+          <span class="firefly fc1"></span>
+          <span class="firefly fc2"></span>
+          <span class="firefly fc3"></span>
+          <span class="firefly fc4"></span>
+          <span class="firefly fc5"></span>
+          <span class="firefly fc6"></span>
+          <span class="firefly fc7"></span>
+          <span class="firefly fc8"></span>
+          <span class="firefly fc9"></span>
+        </div>
         <div class="brand-block">
           <h1>radial</h1>
           <p class="tagline">try the warm approach.</p>
@@ -35,34 +46,36 @@
               method="POST"
               target="_self"
               novalidate>
-          <div class="field with-icon">
-            <label for="wl-phone" class="visually-hidden">phone number</label>
-            <span class="field-icon" aria-hidden="true">🇺🇸</span>
-            <input id="wl-phone"
-                   name="entry.361823065"
-                   type="tel"
-                   inputmode="tel"
-                   autocomplete="tel"
-                   required
-                   placeholder="Phone number" />
-          </div>
-          <div class="field with-icon city-field">
-            <label for="wl-city" class="visually-hidden">city</label>
-            <span class="field-icon pin" aria-hidden="true"></span>
-            <input id="wl-city"
-                   name="entry.943589167"
-                   type="text"
-                   autocomplete="off"
-                   autocorrect="off"
-                   autocapitalize="words"
-                   spellcheck="false"
-                   required
-                   placeholder="City"
-                   role="combobox"
-                   aria-expanded="false"
-                   aria-autocomplete="list"
-                   aria-controls="city-suggestions" />
-            <ul class="city-suggestions" id="city-suggestions" role="listbox" hidden></ul>
+          <div class="field-row">
+            <div class="field with-icon">
+              <label for="wl-phone" class="visually-hidden">phone number</label>
+              <span class="field-icon" aria-hidden="true">🇺🇸</span>
+              <input id="wl-phone"
+                     name="entry.361823065"
+                     type="tel"
+                     inputmode="tel"
+                     autocomplete="tel"
+                     required
+                     placeholder="Phone number" />
+            </div>
+            <div class="field with-icon city-field">
+              <label for="wl-city" class="visually-hidden">city</label>
+              <span class="field-icon pin" aria-hidden="true"></span>
+              <input id="wl-city"
+                     name="entry.943589167"
+                     type="text"
+                     autocomplete="off"
+                     autocorrect="off"
+                     autocapitalize="words"
+                     spellcheck="false"
+                     required
+                     placeholder="City"
+                     role="combobox"
+                     aria-expanded="false"
+                     aria-autocomplete="list"
+                     aria-controls="city-suggestions" />
+              <ul class="city-suggestions" id="city-suggestions" role="listbox" hidden></ul>
+            </div>
           </div>
           <button type="submit">join the waitlist <span aria-hidden="true">→</span></button>
         </form>
@@ -73,14 +86,11 @@
           out when Radial opens where you are.
         </p>
 
-        <div class="privacy-note">
-          <span class="lock-icon" aria-hidden="true"></span>
-          <p>
-            We’ll only contact you about Radial.
-            No spam, no third parties, ever.
-            See our <a href="privacy.html">privacy policy</a>.
-          </p>
-        </div>
+        <p class="privacy-note">
+          We’ll only contact you about Radial.
+          No spam, no third parties, ever.
+          See our <a href="privacy.html">privacy policy</a>.
+        </p>
 
         <div class="signup-status" id="signup-status" role="status" aria-live="polite"></div>
       </section>

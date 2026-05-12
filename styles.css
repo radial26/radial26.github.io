@@ -637,26 +637,25 @@ form.signup button[type="submit"] span {
    phone field with a clickable trigger and a searchable panel. */
 .phone-field { position: relative; }
 
-.phone-field input[type="tel"] {
-  /* Make room for the wider trigger button (flag + chevron). */
-  padding-left: 64px;
-}
-
+/* Flag stays at the same spot the static .field-icon used to sit, so
+   the phone input keeps its original left padding. The button is sized
+   to its content (the flag emoji) and gets a subtle hover ring to
+   signal it's clickable. */
 .country-trigger {
   position: absolute;
-  left: 6px;
+  left: 13px;
   top: 50%;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px 6px 10px;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
   border: 0;
-  border-radius: 14px;
+  border-radius: 50%;
   background: transparent;
-  color: rgba(231, 223, 249, 0.65);
   cursor: pointer;
-  font: inherit;
   line-height: 1;
   transition: background 140ms ease;
   z-index: 2;
@@ -666,16 +665,8 @@ form.signup button[type="submit"] span {
 .country-trigger[aria-expanded="true"] { background: rgba(124, 82, 220, 0.22); }
 
 .country-trigger .flag-emoji {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
-}
-.country-trigger .chevron {
-  display: inline-block;
-  opacity: 0.7;
-  transition: transform 160ms ease;
-}
-.country-trigger[aria-expanded="true"] .chevron {
-  transform: rotate(180deg);
 }
 
 .country-panel {

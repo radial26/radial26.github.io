@@ -74,9 +74,20 @@
               target="_self"
               novalidate>
           <div class="field-row">
-            <div class="field with-icon">
+            <div class="field with-icon phone-field">
               <label for="wl-phone" class="visually-hidden">phone number</label>
-              <span class="field-icon" aria-hidden="true">🇺🇸</span>
+              <button type="button"
+                      id="country-trigger"
+                      class="country-trigger"
+                      aria-label="Select country"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                      data-dial="+1">
+                <span class="flag-emoji" id="country-flag" aria-hidden="true">🇺🇸</span>
+                <svg class="chevron" width="9" height="6" viewBox="0 0 9 6" aria-hidden="true">
+                  <path d="M1 1.25 L4.5 4.75 L8 1.25" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
               <input id="wl-phone"
                      name="entry.361823065"
                      type="tel"
@@ -135,6 +146,17 @@
         </div>
       </section>
 
+      <div class="country-panel" id="country-panel" role="dialog" aria-label="Select country" hidden>
+        <input type="search"
+               id="country-search"
+               class="country-search"
+               placeholder="Search country or code"
+               autocomplete="off"
+               autocorrect="off"
+               spellcheck="false" />
+        <ul class="country-list" id="country-list" role="listbox" aria-label="Countries"></ul>
+      </div>
+
       <footer class="landing-footer">
         <span class="footer-mark">© <span id="year"></span> Radial</span>
         <nav class="footer-links" aria-label="Legal">
@@ -167,20 +189,34 @@
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
+        // Clear any previous error styling.
+        phoneInput.closest('.field')?.classList.remove('invalid');
+        cityInput.closest('.field')?.classList.remove('invalid');
+
         const phone = phoneInput.value.trim();
         const city = cityInput.value.trim();
         const phoneDigits = phone.replace(/\D/g, '');
 
         if (phoneDigits.length < 7) {
           setStatus('error', 'Please enter a valid phone number.');
+          phoneInput.closest('.field')?.classList.add('invalid');
           phoneInput.focus();
           return;
         }
-        if (!city) {
-          setStatus('error', 'Please enter your city.');
+        // City must have been picked from the autocomplete dropdown.
+        if (!city || cityInput.dataset.confirmed !== city) {
+          setStatus('error', 'Please pick your city from the suggestions.');
+          cityInput.closest('.field')?.classList.add('invalid');
           cityInput.focus();
           return;
         }
+
+        // Prefix the phone with the chosen dial code so the recorded
+        // entry is unambiguous (e.g. "+44 7700 900123").
+        const trigger = document.getElementById('country-trigger');
+        const dial = (trigger && trigger.dataset.dial) || '+1';
+        const fd = new FormData(form);
+        fd.set('entry.361823065', `${dial} ${phone}`);
 
         button.disabled = true;
         const original = button.textContent;
@@ -190,14 +226,17 @@
           await fetch(form.action, {
             method: 'POST',
             mode: 'no-cors',
-            body: new FormData(form),
+            body: fd,
           });
           form.reset();
+          delete cityInput.dataset.confirmed;
           setStatus('success',
             "You're on the list. We'll reach out as Radial opens in your area.");
         } catch (err) {
           // Network truly failed — fall back to native submit so the
-          // user's response still reaches Google.
+          // user's response still reaches Google. (Native submit won't
+          // include the dial-code prefix, but the raw number still gets
+          // recorded — better than losing the signup.)
           form.submit();
           return;
         } finally {
@@ -274,6 +313,9 @@
 
       function pick(label) {
         input.value = label;
+        // Mark this city as "confirmed via dropdown" so the form
+        // submit handler can require a real selection.
+        input.dataset.confirmed = label;
         close();
       }
 
@@ -306,6 +348,13 @@
       }
 
       input.addEventListener('input', () => {
+        // Any manual edit invalidates a previous dropdown selection.
+        if (input.dataset.confirmed && input.dataset.confirmed !== input.value) {
+          delete input.dataset.confirmed;
+        }
+        // Clear any existing error state as soon as the user starts typing again.
+        input.closest('.field')?.classList.remove('invalid');
+
         const q = input.value.trim();
         if (q === lastQuery) return;
         lastQuery = q;
@@ -337,6 +386,245 @@
       });
 
       input.addEventListener('blur', () => setTimeout(close, 120));
+    })();
+
+    // Country / dial-code picker for the phone field.
+    // Comprehensive list of ISO 3166-1 alpha-2 codes + ITU E.164 dial codes.
+    // Flag emojis are derived from the ISO code via regional-indicator
+    // codepoints, so we only store [code, dial, name] tuples here.
+    (function () {
+      const COUNTRIES = [
+        ['AF','93','Afghanistan'],['AL','355','Albania'],['DZ','213','Algeria'],
+        ['AS','1','American Samoa'],['AD','376','Andorra'],['AO','244','Angola'],
+        ['AI','1','Anguilla'],['AG','1','Antigua and Barbuda'],['AR','54','Argentina'],
+        ['AM','374','Armenia'],['AW','297','Aruba'],['AU','61','Australia'],
+        ['AT','43','Austria'],['AZ','994','Azerbaijan'],['BS','1','Bahamas'],
+        ['BH','973','Bahrain'],['BD','880','Bangladesh'],['BB','1','Barbados'],
+        ['BY','375','Belarus'],['BE','32','Belgium'],['BZ','501','Belize'],
+        ['BJ','229','Benin'],['BM','1','Bermuda'],['BT','975','Bhutan'],
+        ['BO','591','Bolivia'],['BA','387','Bosnia and Herzegovina'],
+        ['BW','267','Botswana'],['BR','55','Brazil'],['IO','246','British Indian Ocean Territory'],
+        ['VG','1','British Virgin Islands'],['BN','673','Brunei'],['BG','359','Bulgaria'],
+        ['BF','226','Burkina Faso'],['BI','257','Burundi'],['KH','855','Cambodia'],
+        ['CM','237','Cameroon'],['CA','1','Canada'],['CV','238','Cape Verde'],
+        ['KY','1','Cayman Islands'],['CF','236','Central African Republic'],
+        ['TD','235','Chad'],['CL','56','Chile'],['CN','86','China'],
+        ['CX','61','Christmas Island'],['CC','61','Cocos Islands'],['CO','57','Colombia'],
+        ['KM','269','Comoros'],['CK','682','Cook Islands'],['CR','506','Costa Rica'],
+        ['HR','385','Croatia'],['CU','53','Cuba'],['CW','599','Curaçao'],
+        ['CY','357','Cyprus'],['CZ','420','Czechia'],['CD','243','DR Congo'],
+        ['DK','45','Denmark'],['DJ','253','Djibouti'],['DM','1','Dominica'],
+        ['DO','1','Dominican Republic'],['EC','593','Ecuador'],['EG','20','Egypt'],
+        ['SV','503','El Salvador'],['GQ','240','Equatorial Guinea'],['ER','291','Eritrea'],
+        ['EE','372','Estonia'],['SZ','268','Eswatini'],['ET','251','Ethiopia'],
+        ['FK','500','Falkland Islands'],['FO','298','Faroe Islands'],['FJ','679','Fiji'],
+        ['FI','358','Finland'],['FR','33','France'],['GF','594','French Guiana'],
+        ['PF','689','French Polynesia'],['GA','241','Gabon'],['GM','220','Gambia'],
+        ['GE','995','Georgia'],['DE','49','Germany'],['GH','233','Ghana'],
+        ['GI','350','Gibraltar'],['GR','30','Greece'],['GL','299','Greenland'],
+        ['GD','1','Grenada'],['GP','590','Guadeloupe'],['GU','1','Guam'],
+        ['GT','502','Guatemala'],['GG','44','Guernsey'],['GN','224','Guinea'],
+        ['GW','245','Guinea-Bissau'],['GY','592','Guyana'],['HT','509','Haiti'],
+        ['HN','504','Honduras'],['HK','852','Hong Kong'],['HU','36','Hungary'],
+        ['IS','354','Iceland'],['IN','91','India'],['ID','62','Indonesia'],
+        ['IR','98','Iran'],['IQ','964','Iraq'],['IE','353','Ireland'],
+        ['IM','44','Isle of Man'],['IL','972','Israel'],['IT','39','Italy'],
+        ['CI','225','Ivory Coast'],['JM','1','Jamaica'],['JP','81','Japan'],
+        ['JE','44','Jersey'],['JO','962','Jordan'],['KZ','7','Kazakhstan'],
+        ['KE','254','Kenya'],['KI','686','Kiribati'],['XK','383','Kosovo'],
+        ['KW','965','Kuwait'],['KG','996','Kyrgyzstan'],['LA','856','Laos'],
+        ['LV','371','Latvia'],['LB','961','Lebanon'],['LS','266','Lesotho'],
+        ['LR','231','Liberia'],['LY','218','Libya'],['LI','423','Liechtenstein'],
+        ['LT','370','Lithuania'],['LU','352','Luxembourg'],['MO','853','Macau'],
+        ['MG','261','Madagascar'],['MW','265','Malawi'],['MY','60','Malaysia'],
+        ['MV','960','Maldives'],['ML','223','Mali'],['MT','356','Malta'],
+        ['MH','692','Marshall Islands'],['MQ','596','Martinique'],['MR','222','Mauritania'],
+        ['MU','230','Mauritius'],['YT','262','Mayotte'],['MX','52','Mexico'],
+        ['FM','691','Micronesia'],['MD','373','Moldova'],['MC','377','Monaco'],
+        ['MN','976','Mongolia'],['ME','382','Montenegro'],['MS','1','Montserrat'],
+        ['MA','212','Morocco'],['MZ','258','Mozambique'],['MM','95','Myanmar'],
+        ['NA','264','Namibia'],['NR','674','Nauru'],['NP','977','Nepal'],
+        ['NL','31','Netherlands'],['NC','687','New Caledonia'],['NZ','64','New Zealand'],
+        ['NI','505','Nicaragua'],['NE','227','Niger'],['NG','234','Nigeria'],
+        ['NU','683','Niue'],['KP','850','North Korea'],['MK','389','North Macedonia'],
+        ['MP','1','Northern Mariana Islands'],['NO','47','Norway'],['OM','968','Oman'],
+        ['PK','92','Pakistan'],['PW','680','Palau'],['PS','970','Palestine'],
+        ['PA','507','Panama'],['PG','675','Papua New Guinea'],['PY','595','Paraguay'],
+        ['PE','51','Peru'],['PH','63','Philippines'],['PL','48','Poland'],
+        ['PT','351','Portugal'],['PR','1','Puerto Rico'],['QA','974','Qatar'],
+        ['CG','242','Republic of the Congo'],['RE','262','Réunion'],['RO','40','Romania'],
+        ['RU','7','Russia'],['RW','250','Rwanda'],['BL','590','Saint Barthélemy'],
+        ['SH','290','Saint Helena'],['KN','1','Saint Kitts and Nevis'],['LC','1','Saint Lucia'],
+        ['MF','590','Saint Martin'],['PM','508','Saint Pierre and Miquelon'],
+        ['VC','1','Saint Vincent and the Grenadines'],['WS','685','Samoa'],
+        ['SM','378','San Marino'],['ST','239','São Tomé and Príncipe'],
+        ['SA','966','Saudi Arabia'],['SN','221','Senegal'],['RS','381','Serbia'],
+        ['SC','248','Seychelles'],['SL','232','Sierra Leone'],['SG','65','Singapore'],
+        ['SX','1','Sint Maarten'],['SK','421','Slovakia'],['SI','386','Slovenia'],
+        ['SB','677','Solomon Islands'],['SO','252','Somalia'],['ZA','27','South Africa'],
+        ['KR','82','South Korea'],['SS','211','South Sudan'],['ES','34','Spain'],
+        ['LK','94','Sri Lanka'],['SD','249','Sudan'],['SR','597','Suriname'],
+        ['SE','46','Sweden'],['CH','41','Switzerland'],['SY','963','Syria'],
+        ['TW','886','Taiwan'],['TJ','992','Tajikistan'],['TZ','255','Tanzania'],
+        ['TH','66','Thailand'],['TL','670','Timor-Leste'],['TG','228','Togo'],
+        ['TK','690','Tokelau'],['TO','676','Tonga'],['TT','1','Trinidad and Tobago'],
+        ['TN','216','Tunisia'],['TR','90','Turkey'],['TM','993','Turkmenistan'],
+        ['TC','1','Turks and Caicos Islands'],['TV','688','Tuvalu'],['UG','256','Uganda'],
+        ['UA','380','Ukraine'],['AE','971','United Arab Emirates'],
+        ['GB','44','United Kingdom'],['US','1','United States'],['UY','598','Uruguay'],
+        ['UZ','998','Uzbekistan'],['VU','678','Vanuatu'],['VA','39','Vatican City'],
+        ['VE','58','Venezuela'],['VN','84','Vietnam'],['VI','1','US Virgin Islands'],
+        ['WF','681','Wallis and Futuna'],['EH','212','Western Sahara'],
+        ['YE','967','Yemen'],['ZM','260','Zambia'],['ZW','263','Zimbabwe'],
+      ];
+
+      const trigger = document.getElementById('country-trigger');
+      const flag = document.getElementById('country-flag');
+      const panel = document.getElementById('country-panel');
+      const search = document.getElementById('country-search');
+      const list = document.getElementById('country-list');
+      const phone = document.getElementById('wl-phone');
+      if (!trigger || !panel || !search || !list) return;
+
+      let filtered = COUNTRIES.slice();
+      let activeIndex = 0;
+      let selectedISO = 'US';
+
+      function flagEmoji(iso) {
+        const A = 0x1F1E6, O = 'A'.charCodeAt(0);
+        return String.fromCodePoint(...iso.split('').map(c => A + c.charCodeAt(0) - O));
+      }
+
+      function escape(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+        }[c]));
+      }
+
+      function render() {
+        if (!filtered.length) {
+          list.innerHTML = '<li class="empty" aria-disabled="true">No matches</li>';
+          return;
+        }
+        list.innerHTML = filtered.map((c, i) =>
+          `<li role="option" data-iso="${c[0]}" data-dial="${c[1]}"${i === activeIndex ? ' class="active"' : ''}>` +
+            `<span class="cflag" aria-hidden="true">${flagEmoji(c[0])}</span>` +
+            `<span class="cname">${escape(c[2])}</span>` +
+            `<span class="cdial">+${c[1]}</span>` +
+          `</li>`
+        ).join('');
+      }
+
+      function position() {
+        const r = trigger.getBoundingClientRect();
+        // Prefer aligning to the trigger's left edge; flip horizontally
+        // if that would clip the panel off the right of the viewport.
+        const panelW = panel.offsetWidth || 300;
+        let left = r.left;
+        if (left + panelW > window.innerWidth - 12) {
+          left = Math.max(12, window.innerWidth - panelW - 12);
+        }
+        panel.style.top = (r.bottom + 6) + 'px';
+        panel.style.left = left + 'px';
+      }
+
+      function scrollActiveIntoView() {
+        const li = list.querySelector('li.active');
+        if (li) li.scrollIntoView({ block: 'nearest' });
+      }
+
+      function open() {
+        filtered = COUNTRIES.slice();
+        activeIndex = Math.max(0, COUNTRIES.findIndex(c => c[0] === selectedISO));
+        search.value = '';
+        render();
+        panel.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        position();
+        // Give the panel a frame to lay out so we can measure + focus.
+        requestAnimationFrame(() => {
+          search.focus();
+          scrollActiveIntoView();
+        });
+      }
+
+      function close() {
+        panel.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      function pick(iso, dial) {
+        selectedISO = iso;
+        const dialStr = '+' + dial;
+        flag.textContent = flagEmoji(iso);
+        trigger.dataset.dial = dialStr;
+        trigger.setAttribute('aria-label', `Country: ${iso}, dial code ${dialStr}`);
+        close();
+        // Move focus back into the phone input so they can keep typing.
+        phone && phone.focus();
+      }
+
+      function filter(q) {
+        const raw = q.trim();
+        if (!raw) {
+          filtered = COUNTRIES.slice();
+        } else {
+          const lower = raw.toLowerCase();
+          const digits = raw.replace(/\D/g, '');
+          filtered = COUNTRIES.filter(c =>
+            c[2].toLowerCase().includes(lower) ||
+            c[0].toLowerCase().startsWith(lower) ||
+            (digits && c[1].startsWith(digits))
+          );
+        }
+        activeIndex = 0;
+        render();
+      }
+
+      trigger.addEventListener('click', () => {
+        if (panel.hidden) open(); else close();
+      });
+
+      search.addEventListener('input', () => filter(search.value));
+
+      search.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          activeIndex = Math.min(activeIndex + 1, Math.max(0, filtered.length - 1));
+          render();
+          scrollActiveIntoView();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          activeIndex = Math.max(activeIndex - 1, 0);
+          render();
+          scrollActiveIntoView();
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const c = filtered[activeIndex];
+          if (c) pick(c[0], c[1]);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          close();
+          trigger.focus();
+        }
+      });
+
+      list.addEventListener('mousedown', (e) => {
+        const li = e.target.closest('li[role="option"]');
+        if (!li) return;
+        e.preventDefault();
+        pick(li.dataset.iso, li.dataset.dial);
+      });
+
+      // Click outside to close.
+      document.addEventListener('mousedown', (e) => {
+        if (panel.hidden) return;
+        if (panel.contains(e.target) || trigger.contains(e.target)) return;
+        close();
+      });
+
+      window.addEventListener('resize', () => { if (!panel.hidden) position(); });
+      window.addEventListener('scroll', () => { if (!panel.hidden) position(); }, { passive: true });
     })();
   </script>
 </body>

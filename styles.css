@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap');
 
 :root {
-  --bg: #03020a;
-  --panel: #050611;
-  --panel-soft: #090914;
-  --field: #0b0a18;
-  --border: rgba(110, 76, 191, 0.42);
-  --border-soft: rgba(124, 82, 220, 0.28);
+  --bg: #1c1c20;
+  --panel: #202026;
+  --panel-soft: #26262d;
+  --field: #222228;
+  --border: rgba(132, 132, 160, 0.28);
+  --border-soft: rgba(168, 145, 229, 0.24);
   --violet: #9c5cff;
   --violet-2: #6f37ee;
   --violet-3: #bc7cff;
   --text-primary: #f5f2ff;
-  --text-secondary: rgba(244, 238, 255, 0.82);
-  --text-muted: rgba(214, 204, 236, 0.52);
+  --text-secondary: #f5f2ff;
+  --text-muted: #f5f2ff;
   --success: #8be0a8;
   --error: #ff8f9d;
   --radius-xl: 34px;
@@ -31,8 +31,8 @@ body {
   height: 100dvh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 74% 30%, rgba(95, 51, 184, 0.22), transparent 22%),
-    linear-gradient(180deg, #010108 0%, #03020a 100%);
+    radial-gradient(circle at 72% 30%, rgba(98, 79, 148, 0.16), transparent 24%),
+    linear-gradient(180deg, #19191d 0%, #1f1f24 100%);
   color: var(--text-primary);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -47,7 +47,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 a {
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid rgba(188, 124, 255, 0.3);
+  border-bottom: 1px solid rgba(245, 242, 255, 0.34);
 }
 
 a:hover { color: var(--violet-3); }
@@ -66,10 +66,10 @@ p { margin: 0; }
   position: relative;
   height: 100%;
   display: grid;
-  grid-template-columns: 34% 66%;
+  grid-template-columns: 38% 62%;
   grid-template-rows: 1fr auto;
-  background: linear-gradient(180deg, rgba(4, 5, 16, 0.98), rgba(3, 4, 12, 1));
-  border: 1px solid rgba(102, 88, 154, 0.42);
+  background: linear-gradient(180deg, rgba(31, 31, 37, 0.98), rgba(26, 26, 31, 1));
+  border: 1px solid rgba(130, 130, 146, 0.24);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
@@ -84,7 +84,7 @@ p { margin: 0; }
   width: 320px;
   transform: translateX(-50%);
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(2, 2, 10, 0) 0%, rgba(10, 7, 22, 0.12) 10%, rgba(18, 10, 36, 0.26) 24%, rgba(24, 13, 46, 0.4) 42%, rgba(24, 13, 46, 0.36) 58%, rgba(18, 10, 36, 0.16) 76%, rgba(18, 10, 36, 0) 100%);
+  background: linear-gradient(90deg, rgba(28, 28, 33, 0) 0%, rgba(31, 31, 37, 0.12) 10%, rgba(36, 36, 42, 0.24) 24%, rgba(42, 42, 48, 0.34) 42%, rgba(42, 42, 48, 0.3) 58%, rgba(34, 34, 39, 0.14) 76%, rgba(28, 28, 33, 0) 100%);
   filter: blur(20px);
   z-index: 3;
 }
@@ -98,7 +98,7 @@ p { margin: 0; }
   align-items: flex-start;
   overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(2, 2, 10, 0.94) 0%, rgba(2, 2, 10, 0.91) 48%, rgba(8, 5, 20, 0.76) 68%, rgba(12, 7, 26, 0.44) 82%, rgba(12, 7, 26, 0.08) 100%);
+    linear-gradient(90deg, rgba(28, 28, 32, 0.96) 0%, rgba(30, 30, 35, 0.94) 50%, rgba(34, 34, 39, 0.8) 68%, rgba(39, 37, 45, 0.48) 82%, rgba(39, 37, 45, 0.1) 100%);
   justify-content: center;
 }
 
@@ -131,7 +131,7 @@ p { margin: 0; }
 }
 
 .tagline {
-  color: #a95bff;
+  color: var(--text-primary);
   font-size: clamp(18px, 1.6vw, 26px);
   letter-spacing: -0.03em;
   font-weight: 400;
@@ -139,11 +139,16 @@ p { margin: 0; }
 
 .intro {
   max-width: 520px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: clamp(13px, 1.18vw, 15px);
-  line-height: 1.42;
-  margin-bottom: clamp(18px, 2.4vh, 28px);
+  line-height: 1.5;
+  margin-bottom: clamp(10px, 1.4vh, 16px);
   width: 100%;
+  font-family: "Special Elite", "Courier New", ui-monospace, monospace;
+}
+
+.intro-secondary {
+  max-width: 560px;
 }
 
 form.signup {
@@ -211,7 +216,7 @@ form.signup input[type="email"] {
 }
 
 form.signup input::placeholder {
-  color: rgba(231, 223, 249, 0.42);
+  color: rgba(245, 242, 255, 0.56);
 }
 
 form.signup input:focus {
@@ -260,20 +265,22 @@ form.signup button[type="submit"] span {
 .rollout-copy {
   max-width: 420px;
   margin-top: clamp(14px, 1.8vh, 20px);
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-size: clamp(13px, 1vw, 14px);
   line-height: 1.5;
   width: 100%;
+  font-family: "Special Elite", "Courier New", ui-monospace, monospace;
 }
 
 .privacy-note {
   max-width: 430px;
   margin-top: clamp(18px, 2.2vh, 26px);
   padding-top: 0;
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-size: 12.5px;
   line-height: 1.62;
   width: 100%;
+  font-family: "Special Elite", "Courier New", ui-monospace, monospace;
 }
 
 .signup-status {
@@ -302,10 +309,18 @@ form.signup button[type="submit"] span {
 .landing-scene {
   position: relative;
   min-height: 0;
-  margin-left: -88px;
+  margin: 96px 116px 96px 58px;
+  border-radius: 34px;
+  border: 1px solid rgba(154, 92, 255, 0.48);
   background:
-    linear-gradient(90deg, rgba(6, 4, 16, 0.34) 0%, rgba(6, 4, 16, 0.12) 18%, rgba(6, 4, 16, 0) 34%),
+    linear-gradient(90deg, rgba(29, 29, 34, 0.3) 0%, rgba(29, 29, 34, 0.12) 16%, rgba(29, 29, 34, 0) 30%),
     url("assets/hero-scene-crop.png") center center / cover no-repeat;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(169, 91, 255, 0.14),
+    0 0 22px rgba(124, 82, 220, 0.24),
+    0 0 44px rgba(124, 82, 220, 0.12);
+  overflow: hidden;
 }
 
 .firefly-layer {
@@ -606,9 +621,9 @@ form.signup button[type="submit"] span {
   justify-content: space-between;
   gap: 24px;
   padding: 14px clamp(28px, 4vw, 56px);
-  border-top: 1px solid rgba(124, 82, 220, 0.22);
-  background: rgba(2, 2, 10, 0.92);
-  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(27, 27, 32, 0.94);
+  color: var(--text-primary);
   font-size: 13px;
 }
 
@@ -628,7 +643,7 @@ form.signup button[type="submit"] span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   border-bottom: 0;
   font-size: 13px;
   transition: color 140ms ease, opacity 140ms ease;
@@ -669,7 +684,7 @@ form.signup button[type="submit"] span {
 }
 
 .landing-footer a {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   border-bottom: 0;
   transition: color 140ms ease;
 }
@@ -1096,7 +1111,7 @@ body.legal-page {
   .landing-copy {
     padding: 56px 24px 36px;
     overflow: visible;
-    background: linear-gradient(180deg, rgba(2, 2, 10, 0.96), rgba(2, 2, 10, 0.84));
+    background: linear-gradient(180deg, rgba(28, 28, 32, 0.96), rgba(31, 31, 36, 0.88));
     display: block;
   }
 
@@ -1108,7 +1123,7 @@ body.legal-page {
     width: auto;
     height: 96px;
     transform: none;
-    background: linear-gradient(180deg, rgba(2, 2, 10, 0) 0%, rgba(12, 7, 26, 0.3) 35%, rgba(12, 7, 26, 0.44) 55%, rgba(12, 7, 26, 0) 100%);
+    background: linear-gradient(180deg, rgba(28, 28, 32, 0) 0%, rgba(37, 37, 42, 0.28) 35%, rgba(43, 43, 48, 0.42) 55%, rgba(28, 28, 32, 0) 100%);
     filter: blur(12px);
   }
 
@@ -1161,10 +1176,15 @@ body.legal-page {
     width: 100%;
     aspect-ratio: 16 / 10;
     margin: 4px 0 26px;
-    border-radius: 20px;
-    background: url("assets/hero-scene-crop.png") center center / cover no-repeat;
-    box-shadow: 0 18px 40px rgba(2, 1, 12, 0.45),
-                inset 0 0 0 1px rgba(124, 82, 220, 0.18);
+    border-radius: 24px;
+    border: 1px solid rgba(154, 92, 255, 0.46);
+    background: url("assets/hero-scene-crop.png") center center / 72% auto no-repeat;
+    box-shadow:
+      0 18px 40px rgba(2, 1, 12, 0.34),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 0 0 1px rgba(169, 91, 255, 0.14),
+      0 0 22px rgba(124, 82, 220, 0.24),
+      0 0 40px rgba(124, 82, 220, 0.1);
   }
 
   .firefly-layer-mobile {

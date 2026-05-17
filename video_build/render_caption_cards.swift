@@ -3,18 +3,23 @@ import Foundation
 
 let fm = FileManager.default
 
-guard CommandLine.arguments.count > 1 else {
-    fputs("Usage: swift render_caption_cards.swift <caption-dir>\n", stderr)
+guard CommandLine.arguments.count >= 8 else {
+    fputs("Usage: swift render_caption_cards.swift <caption-dir> <width> <height> <font-name> <font-size> <text-width> <top-margin>\n", stderr)
     exit(1)
 }
 
 let dirURL = URL(fileURLWithPath: CommandLine.arguments[1], isDirectory: true)
-let size = NSSize(width: 1080, height: 1920)
-let textWidth: CGFloat = 820
-let boxPaddingX: CGFloat = 34
-let boxPaddingY: CGFloat = 26
-let bottomMargin: CGFloat = 180
-let font = NSFont(name: "Arial Bold", size: 58) ?? NSFont.boldSystemFont(ofSize: 58)
+let width = CGFloat(Double(CommandLine.arguments[2]) ?? 1920)
+let height = CGFloat(Double(CommandLine.arguments[3]) ?? 1080)
+let fontName = CommandLine.arguments[4]
+let fontSize = CGFloat(Double(CommandLine.arguments[5]) ?? 40)
+let textWidth = CGFloat(Double(CommandLine.arguments[6]) ?? 1560)
+let topMargin = CGFloat(Double(CommandLine.arguments[7]) ?? 64)
+
+let size = NSSize(width: width, height: height)
+let font = NSFont(name: fontName, size: fontSize)
+    ?? NSFont(name: "HelveticaNeue-Light", size: fontSize)
+    ?? NSFont.systemFont(ofSize: fontSize, weight: .light)
 
 let paragraph = NSMutableParagraphStyle()
 paragraph.alignment = .center
@@ -22,8 +27,9 @@ paragraph.lineBreakMode = .byWordWrapping
 
 let attrs: [NSAttributedString.Key: Any] = [
     .font: font,
-    .foregroundColor: NSColor.white,
-    .paragraphStyle: paragraph
+    .foregroundColor: NSColor(calibratedWhite: 1.0, alpha: 0.96),
+    .paragraphStyle: paragraph,
+    .kern: 0.6
 ]
 
 let textFiles = try fm.contentsOfDirectory(at: dirURL, includingPropertiesForKeys: nil)
@@ -48,29 +54,16 @@ for textFile in textFiles {
 
     ctx.clear(CGRect(origin: .zero, size: size))
 
-    let boxWidth = min(size.width - 120, bounds.width + boxPaddingX * 2)
-    let boxHeight = bounds.height + boxPaddingY * 2
-    let boxRect = CGRect(
-        x: (size.width - boxWidth) / 2,
-        y: bottomMargin,
-        width: boxWidth,
-        height: boxHeight
-    )
-
-    let boxPath = NSBezierPath(roundedRect: boxRect, xRadius: 28, yRadius: 28)
-    NSColor(calibratedWhite: 0.0, alpha: 0.34).setFill()
-    boxPath.fill()
-
     let textRect = CGRect(
-        x: (size.width - textWidth) / 2,
-        y: boxRect.minY + boxPaddingY - 2,
+        x: (width - textWidth) / 2,
+        y: height - topMargin - bounds.height - 8,
         width: textWidth,
-        height: bounds.height + 10
+        height: bounds.height + 12
     )
 
     let shadow = NSShadow()
-    shadow.shadowColor = NSColor(calibratedWhite: 0.0, alpha: 0.45)
-    shadow.shadowBlurRadius = 4
+    shadow.shadowColor = NSColor(calibratedWhite: 0.0, alpha: 0.55)
+    shadow.shadowBlurRadius = 5
     shadow.shadowOffset = .init(width: 0, height: -1)
 
     NSGraphicsContext.saveGraphicsState()
@@ -91,5 +84,4 @@ for textFile in textFiles {
 
     let outURL = dirURL.appendingPathComponent(textFile.deletingPathExtension().lastPathComponent + ".png")
     try png.write(to: outURL)
-    print(outURL.path)
 }
